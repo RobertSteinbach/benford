@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!--
+https://pythonspot.com/flask-and-great-looking-charts-using-chart-js/
+https://www.chartjs.org/docs/latest/
+-->
+<script>
+    function csvClick(){
+        //alert('hi');
+        if (form1.CSVOption.value=='') {
+            form1.rawdata.value='';
+        }
+
+        form1.submit();     //submit in any case
+    }
+
+    function clickClear(){
+        form1.rawdata.value='';
+        form1.CSVOption.value='';
+    }
+</script>
+<script src="{{url_for('static',filename='Chart.js')}}" xmlns="http://www.w3.org/1999/html"></script>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Benford's Law Tester</title>
+</head>
+<body>
+{{eMsg}}<hr>
+<form id="form1" name="form1" method="post"><input type="hidden" name="prefill" value="">
+<table><tr><td width="200">
+    <textarea rows="20" cols = "20" name="rawdata" placeholder="Paste data here">{{textarea | safe}}</textarea>
+    </td>
+    <td align="top">
+        <b>Prefill options:</b><br>
+        <select name="CSVOption" size="15" onchange="csvClick();">
+                        {{csvOptionsHTML | safe}}
+        </select>
+        <br>
+<!-- Good sample code
+        <button onclick="form1.prefill.value='populations by country.csv';form1.submit();">Populations by Country</button>
+    <a href="https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population" target="_new">source</a>
+-->
+</td></tr>
+<tr><td>
+    <input type="submit" name="btnsubmit" value="Submit">
+    <button onclick="clickClear();">Clear</button>
+</td></tr></table>
+<table><tr><td height="300" width="450">
+    <canvas id="myChart" width="40" height="50"></canvas>
+    </td>
+<td width="500" align="right">
+    <table>
+    <tr>
+        <th>1st Digit</th>
+        <th>Count</th>
+        <th>Percentage</th>
+    </tr>
+{%for row in stats%}
+    <tr>
+        <td align="center">{{row}}</td>
+        <td align="center">{{stats[row]}}</td>
+        <td align="center">{{(stats[row]/rowCount*100)|round(1)}}</td>
+    </tr>
+{%endfor%}
+</table>
+
+</td>
+
+</tr></table>
+</form>
+<hr>
+Number of Values Evaluated: {{rowCount}}<br>
+{%for row in data%}
+{{row}}
+{%endfor%}
+
+
+    <script>
+var ctx = document.getElementById('myChart').getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{labels}},
+        datasets: [{
+            label: 'Frequency of first number',
+            data: {{values}},
+            backgroundColor: 'rgba(0, 100, 255, 0.8)',
+         }]
+    },
+    options: {
+        maintainAspectRatio: false,
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }
+    }
+});
+</script>
+
+</body>
+</html>
